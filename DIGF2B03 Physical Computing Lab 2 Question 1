@@ -1,0 +1,140 @@
+/*
+Project Title: Lab 2 Part 1
+ Student Name: Sally Luc
+ Course Code & Title: DIGF 2B03 Physical Computing
+ OCAD University
+ Created on Saturday January 17th, 2015
+ 
+ Based on
+ Debounce, David A. Mellis, http://www.arduino.cc/en/Tutorial/Debounce
+ BlinkWithoutDelay, David A. Mellis, http://arduino.cc/en/Tutorial/BlinkWithoutDelay
+ */
+
+
+/*
+Variable Dictionary 
+ 
+ Variable Name                 Type                   Description
+ ledPinOutput                  int                    Sends signals through input digital pin 7 to control LED.
+ button1                       int                    Retrieves button input value from input digital pin 8. 
+ button2                       int                    Retrieves button input value from input digital pin 9. 
+ button3                       int                    Retrieves button input value from input digital pin 10. 
+ 
+ button1Pressed                int                    Reads the value of button1 if it is HIGH/LOW.
+ button2Pressed                int                    Reads the value of button2 if it is HIGH/LOW.
+ button3Pressed                int                    Reads the value of button3 if it is HIGH/LOW.
+ 
+ lastButtonState1              int                    Checks if the last button state was HIGH/LOW in each loop for button1. 
+ lastButtonState2              int                    Checks if the last button state was HIGH/LOW in each loop for button2.
+ lastButtonState3              int                    Checks if the last button state was HIGH/LOW in each loop for button3.
+ buttonState1                  int                    Stores the current state of button1. 
+ buttonState2                  int                    Stores the current state of button2. 
+ buttonState3                  int                    Stores the current state of button3. 
+ 
+ buttonNum                     int                    This is for checking which button was pressed. The values can be seen in the Serial Monitor.
+ 
+ ledState                      int                    Sets the LED state to either HIGH or LOW.
+ delaySpeed                    long                   Sets the delay speed of how long the LED should turn on/off.
+ previousMs                    long                   Sets the previous millisecond values to figure out when LED should turn on/off. 
+ */
+
+// Variables
+int ledPinOutput = 7;
+int button1 = 8;
+int button2 = 9;
+int button3 = 10; 
+
+int button1Pressed,button2Pressed,button3Pressed;
+
+int lastButtonState1 = LOW;
+int lastButtonState2 = LOW;
+int lastButtonState3 = LOW;
+int buttonState1, buttonState2, buttonState3;
+
+int buttonNum = 0; 
+
+int ledState = LOW;
+long delaySpeed = 500;
+long previousMs = 0; 
+
+
+// Setup - Declares the type of what each pin will do - either retrieve input or send out output signals. 
+void setup ()
+{
+  pinMode (button1, INPUT);
+  pinMode (button2, INPUT);
+  pinMode (button3, INPUT);
+  pinMode (ledPinOutput, OUTPUT);
+  Serial.begin (9600);
+}
+
+// Loop
+void loop()
+{
+  // Stores the last button state, which later is used to prevent the program from responding as if button was pressed multiple times.
+  lastButtonState1 = button1Pressed;
+  lastButtonState2 = button2Pressed;
+  lastButtonState3 = button3Pressed;
+
+  // Reads the button states - if the buttons were pressed or not
+  button1Pressed = digitalRead(button1);
+  button2Pressed = digitalRead(button2);
+  button3Pressed = digitalRead(button3);
+
+  // Checks if the button state has changed from the loop before and now
+  if (button1Pressed != buttonState1) {
+    buttonState1 = button1Pressed;
+
+    // Changes the LED delay speed to a faster rate
+    if (buttonState1 == HIGH) {
+      delaySpeed = 100; 
+      buttonNum = 1; 
+    }
+  }
+
+  // Checks if the button state has changed from the loop before and now
+  if (button2Pressed != buttonState2) {
+    buttonState2 = button2Pressed;
+    // Changes the LED delay speed to a medium rate
+    if (buttonState2 == HIGH) {
+      delaySpeed = 500; 
+      buttonNum = 2; 
+    }
+  }
+
+  // Checks if the button state has changed from the loop before and now
+  if (button3Pressed != buttonState3) {
+    buttonState3 = button3Pressed;
+    // Changes the LED delay speed to a slower rate
+    if (buttonState3 == HIGH) {
+      delaySpeed = 1000; 
+      buttonNum = 3; 
+    }
+  }
+
+  // Local variable - stores the current millisecond value
+  unsigned long currentMs = millis();
+
+  // previousMS value only changes if the difference of the currentMS and previousMS is greater than the delay speed.
+  //This block of code checks if the LED should blink, depending on the last time the LED blinked.
+
+  // If statement checks if the different of currentMS and previousMS is greater than delaySpeed
+  if(currentMs - previousMs > delaySpeed) {
+    // Conditions are met, so change the previousMS value
+    previousMs = currentMs; 
+
+    // Toggle the LED state
+    if (ledState == LOW)
+      ledState = HIGH;
+    else
+      ledState = LOW;
+
+    // Set the LED to turn on (HIGH) or off (LOW), which is stored in ledState
+    digitalWrite(ledPinOutput, ledState);
+
+  }
+
+  // Displays which button as been pressed in Serial Monitor
+  Serial.print("ButtonPressed = ");
+  Serial.println (buttonNum); 
+}
