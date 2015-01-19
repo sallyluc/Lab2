@@ -1,0 +1,210 @@
+/*
+ Project Title: Lab 2 Part 3
+ Student Name: Sally Luc
+ Course Code & Title: DIGF 2B03 Physical Computing
+ OCAD University
+ Created on Saturday January 17th, 2015
+ 
+ Based on
+ Debounce, David A. Mellis, http://www.arduino.cc/en/Tutorial/Debounce
+ */
+
+
+/*
+Variable Dictionary 
+ 
+ Variable Name                 Type                   Description
+ ledPin                        int                    Sends signals through input digital pins to control LED.
+ button0-9                     int                    Retrieves button input value from input digital pins 0-9. 
+ 
+ button#Pressed, # being 0-9   int                    Reads the value of button if it is HIGH/LOW.
+ 
+ lastButtonState0-9            int                    Checks if the last button state was HIGH/LOW in each loop for the button. 
+ buttonState0-9                int                    Stores the current state of button. 
+ */
+
+// Variables
+int ledPin = 13;
+int button1 = 11;
+int button2 = 2;
+int button3 = 3; 
+int button4 = 4;
+int button5 = 5;
+int button6 = 6;
+int button7 = 7;
+int button8 = 8;
+int button9 = 9;
+int button0 = 10;
+
+int button1Pressed,button2Pressed,button3Pressed,
+button4Pressed,button5Pressed,button6Pressed,
+button7Pressed,button8Pressed,button9Pressed,button0Pressed;
+
+int lastButtonState1 = LOW;
+int lastButtonState2 = LOW;
+int lastButtonState3 = LOW;
+int lastButtonState4 = LOW;
+int lastButtonState5 = LOW;
+int lastButtonState6 = LOW;
+int lastButtonState7 = LOW;
+int lastButtonState8 = LOW;
+int lastButtonState9 = LOW;
+int lastButtonState0 = LOW;
+
+int buttonState1, buttonState2, buttonState3,
+buttonState4, buttonState5, buttonState6,
+buttonState7, buttonState8, buttonState9,
+buttonState0;
+
+// Setup - Declares the type of what each pin will do - either retrieve input or send out output signals. 
+void setup ()
+{
+  pinMode (button1, INPUT);
+  pinMode (button2, INPUT);
+  pinMode (button3, INPUT);
+  pinMode (button4, INPUT);
+  pinMode (button5, INPUT);
+  pinMode (button6, INPUT);
+  pinMode (button7, INPUT);
+  pinMode (button8, INPUT);
+  pinMode (button9, INPUT);
+  pinMode (button0, INPUT);
+
+  pinMode (ledPin, OUTPUT);
+  Serial.begin (9600);
+}
+
+// Loop
+void loop()
+{
+  // Stores the last button state, which later is used to prevent the program from responding as if button was pressed multiple times.
+  lastButtonState1 = button1Pressed;
+  lastButtonState2 = button2Pressed;
+  lastButtonState3 = button3Pressed;
+  lastButtonState4 = button4Pressed;
+  lastButtonState5 = button5Pressed;
+  lastButtonState6 = button6Pressed;
+  lastButtonState7 = button7Pressed;
+  lastButtonState8 = button8Pressed;
+  lastButtonState9 = button9Pressed;
+  lastButtonState0 = button0Pressed;
+
+  // Reads the button states - if the buttons were pressed or not
+  button1Pressed = digitalRead(button1);
+  button2Pressed = digitalRead(button2);
+  button3Pressed = digitalRead(button3);
+  button4Pressed = digitalRead(button4);
+  button5Pressed = digitalRead(button5);
+  button6Pressed = digitalRead(button6);
+  button7Pressed = digitalRead(button7);
+  button8Pressed = digitalRead(button8);
+  button9Pressed = digitalRead(button9);
+  button0Pressed = digitalRead(button0);
+  // Checks if the button state has changed from the loop before and now
+  if (button1Pressed != buttonState1) {
+    buttonState1 = button1Pressed;
+
+    // Changes the LED delay speed to a faster rate
+    if (buttonState1 == HIGH) {
+      timesToFlash = 1;
+    }
+  }
+
+  // Checks if the button state has changed from the loop before and now
+  if (button2Pressed != buttonState2) {
+    buttonState2 = button2Pressed;
+    // Changes the LED delay speed to a medium rate
+    if (buttonState2 == HIGH) { 
+      timesToFlash = 2;
+    }
+  }
+
+  // Checks if the button state has changed from the loop before and now
+  if (button3Pressed != buttonState3) {
+    buttonState3 = button3Pressed;
+    // Changes the LED delay speed to a slower rate
+    if (buttonState3 == HIGH) {
+      timesToFlash = 3;
+    }
+  }
+
+  // Checks if the button state has changed from the loop before and now
+  if (button4Pressed != buttonState4) {
+    buttonState4 = button4Pressed;
+    // Changes the LED delay speed to a slower rate
+    if (buttonState4 == HIGH) {
+      timesToFlash = 4;
+    }
+  }
+
+  // Checks if the button state has changed from the loop before and now
+  if (button5Pressed != buttonState5) {
+    buttonState5 = button5Pressed;
+    // Changes the LED delay speed to a slower rate
+    if (buttonState5 == HIGH) {
+      timesToFlash = 5;
+    }
+  }
+
+  // Checks if the button state has changed from the loop before and now
+  if (button6Pressed != buttonState6) {
+    buttonState6 = button6Pressed;
+    // Changes the LED delay speed to a slower rate
+    if (buttonState6 == HIGH) {
+      timesToFlash = 6;
+    }
+  }
+
+  // Checks if the button state has changed from the loop before and now
+  if (button7Pressed != buttonState7) {
+    buttonState7 = button7Pressed;
+    // Changes the LED delay speed to a slower rate
+    if (buttonState7 == HIGH) {
+      timesToFlash = 7;
+    }
+  }
+
+  // Checks if the button state has changed from the loop before and now
+  if (button8Pressed != buttonState8) {
+    buttonState8 = button8Pressed;
+    // Changes the LED delay speed to a slower rate
+    if (buttonState8 == HIGH) {
+      timesToFlash = 8;
+    }
+  } 
+
+  // Checks if the button state has changed from the loop before and now
+  if (button9Pressed != buttonState9) {
+    buttonState9 = button9Pressed;
+    // Changes the LED delay speed to a slower rate
+    if (buttonState9 == HIGH) {
+      timesToFlash = 9;
+    }
+  }
+
+  //SPECIAL CASE..DO SOMETHING ELSE FOR THIS
+  // Checks if the button state has changed from the loop before and now
+  if (button0Pressed != buttonState0) {
+    buttonState0 = button0Pressed;
+    // Changes the LED delay speed to a slower rate
+    if (buttonState0 == HIGH) {
+      timesToFlash = 0;
+
+      // make a longer flash
+      digitalWrite (ledPin, HIGH);
+      delay(3000);
+      digitalWrite (ledPin, LOW);
+    }
+  }
+
+  // Loops the flashing of the LED. The number is based on which button was pressed. 
+  while (timesToFlash >0)
+  {
+    digitalWrite (ledPin, HIGH);
+    delay(500);
+    digitalWrite (ledPin, LOW);
+    delay(500);
+    timesToFlash--;
+  }
+}
+
