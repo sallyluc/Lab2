@@ -1,0 +1,100 @@
+/*
+ Project Title: Lab 4 Part 1
+ Student Name: Sally Luc
+ Course Code & Title: DIGF 2B03 Physical Computing
+ OCAD University
+ Created on Saturday January 31st, 2015
+ 
+ Based on
+ Tone, Tom Igoe, http://www.arduino.cc/en/Tutorial/Tone
+ Tone2, Tom Igoe, http://www.arduino.cc/en/Tutorial/Tone2#.Uwthc0JdXfU
+ */
+
+
+/*
+Variable Dictionary 
+ 
+ Variable Name                 Type                   Description
+ speaker                       int                    Output signal for the speaker.
+ tones, tones2, tones3         array                  Stores the notes of the music. tones stores a lower octave of notes, tones2 stores a slightly higher octave of notes, and tones3 stores octaves of notes that's higher than tones and tones2.
+ 
+ ldrVal1, ldrVal2, ldrVal3     int                    Senses the range of brightness in the environment. 
+ ldrPin1, ldrPin2, ldrPin3     int                    Input pins to read the LDR values. 
+ */
+
+//Variable Declaration
+int speakerPin = 8;
+
+// Note: This is finicky, meaning if the pitches.h file was used instead of these numbers, an error occurs even if the file is within the same folder as the project. Cannot find solution to linking headers.
+int tones[] = {
+  131, 147, 165,175,196,220,247};
+int tones2[] = {
+  262, 294, 330, 349, 392, 440, 494};
+int tones3[] = {
+  523, 587, 659, 698, 784, 880, 988};
+
+int ldrPin1 = A0;
+int ldrPin2 = A1;
+int ldrPin3 = A2;
+int ldrVal1;
+int ldrVal2;
+int ldrVal3;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop ()
+{
+  // Reads the LDR values
+  ldrVal1 = analogRead(ldrPin1);
+  ldrVal2 = analogRead(ldrPin2);
+  ldrVal3 = analogRead(ldrPin3);
+
+  // maps each LDR value to values between 0 and 8
+  ldrVal1 = map (ldrVal1, 10, 160, 0, 8);
+  ldrVal2 = map (ldrVal2, 50, 220, 0, 8);
+  ldrVal3 = map (ldrVal3, 10, 195, 0, 8);
+
+  // Prints out the LDR values
+  Serial.print("LDR1: ");
+  Serial.println(ldrVal1);
+  Serial.print("LDR2: ");
+  Serial.println(ldrVal2);
+  Serial.print("LDR3: ");
+  Serial.println(ldrVal3);
+
+  // Checks to see if other sensors are being read. If one is read, it will play the tone depending on which value the sensor is reading.
+  if (ldrVal2 >=8 && ldrVal3 >=8){
+    // Ensures the range ldrVal is reading is under 7, or else it will be out of range.
+    if (ldrVal1 <7)
+      // Play tone
+      tone (speakerPin, tones[ldrVal1]); 
+    else
+      noTone(speakerPin); // Stop tone 
+  }
+  else if (ldrVal1 >=8 && ldrVal3 >=8){ // Code similar to top part, but checks ldrVal2 instead.
+    if (ldrVal2 <7)
+      tone (speakerPin, tones[ldrVal2]);
+    else
+      noTone(speakerPin);
+  }
+  else if (ldrVal1 >=8 && ldrVal2 >=8){// Code similar to top part, but checks ldrVal3 instead.
+    if (ldrVal3 <7)
+      tone (speakerPin, tones[ldrVal3]);
+    else
+      noTone(speakerPin);
+  }
+  else
+    noTone(speakerPin); // Stops tone
+    
+  delay (100); // slows down program by 100 ms
+}
+
+
+
+
+
+
+
+
