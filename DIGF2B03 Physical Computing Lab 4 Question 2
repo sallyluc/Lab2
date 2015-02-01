@@ -1,0 +1,131 @@
+// Adds the Servo library to this project
+#include <Servo.h> 
+
+/*
+Variable Dictionary 
+ 
+ Variable Name                 Type                   Description
+ led1, led2                    int                    Pins for LEDs that turns on when signaled to by LDRs.  
+ ledR2, ledR3                  int                    Pins that turns red LEDs on and off. Indicators for which LDR is signaling the servo to connect or disconnect the green led.
+ 
+ speaker                       int                    Pin that controls the speaker.
+ distanceSensor                int                    Connects signal to distrance sensor to get the values being read from the distrance sensor. 
+ 
+ ldr1, ldr2, ldr3              int                    Pins to the LDRs to get reading values.
+ 
+ ldrVal1, ldrVal2, ldrVal3     int                    Senses if the environment is darker or brighter. 
+ checkpoint1, checkpoint2,
+ checkpoint3                 int                    Checker for if a certain point of the contraption has activated yet or not.
+ 
+ melody                        array (int)            Stores the notes for the tune.
+ noteDurations                 array (int)            Stores the length of each note. (Quarter note, eighth note, etc.)
+ */
+
+
+// Variable Declaration
+Servo servo;
+int led1 = 13; 
+int led2 = 6;
+
+int ledR2 = 3;
+int ledR3 = 2;
+
+int speaker = 8;
+
+int distanceSensor = A0;
+int ldr1 = A1;
+int ldr2 = A2;
+int ldr3 = A3;
+
+int ldrVal1, ldrVal2, ldrVal3, dVal;
+
+boolean checkpoint1= false;
+boolean checkpoint2= false;
+boolean checkpoint3 = false;
+
+int melody[] = {
+  262, 196,196, 220, 196,0, 247, 262};
+
+int noteDurations[] = {
+  4, 8, 8, 4,4,4,4,4 };
+
+// Setup - sets all components to original state. Declares what digital pins are, either INPUT or OUTPUT. 
+void setup ()
+{
+  servo.attach(9);
+  servo.write (180);// initial servo state, 0 is switch on 
+
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(ledR2, OUTPUT);
+  pinMode(ledR3, OUTPUT);
+
+  pinMode(speaker, OUTPUT);
+  pinMode(led1, OUTPUT);
+
+  digitalWrite(led1, LOW);
+  digitalWrite(led2, HIGH);
+  digitalWrite(ledR2, LOW);
+  digitalWrite(ledR3, LOW);
+
+  Serial.begin(9600);
+}
+
+// Loop - Contraption activator
+void loop ()
+{
+  // Reads all sensor values
+  dVal = analogRead (distanceSensor);
+  ldrVal1 = analogRead (ldr1);
+  ldrVal2 = analogRead (ldr2);
+  ldrVal3 = analogRead (ldr3);
+
+  //  Serial.println (dVal);
+
+
+  // Checkpoint 1 = LED lights up if distrance sensor senses someone/something in front of it.
+  if (dVal > 500 && checkpoint1 == false){
+    digitalWrite(led1, HIGH);
+    checkpoint1 = true;
+    delay (2000);
+  }
+
+  // Checkpoint 2 = Play sound if previous portion of the contraption activated
+  if (ldrVal1 > 150 &&  checkpoint2 == false&&  checkpoint1 == true)
+  {
+    checkpoint2 = true;
+    // Loop that plays the sound
+    for (int thisNote = 0; thisNote < 8; thisNote++) {
+      int noteDuration = 1000/noteDurations[thisNote];
+      tone(8, melody[thisNote],noteDuration);
+
+      int pauseBetweenNotes = noteDuration * 1.30;
+      delay(pauseBetweenNotes);
+      noTone(speaker);
+    }
+    // Next part of the contraption - motor activates and connects conductors to light up an LED.
+    servo.write(0);
+    delay (2000);
+  }
+
+  // Checkpoint 3 = Servo disconnection. An LDR reads the values and senses if the LED is on or not. If it is on, it sends a signal to the servo to disconnect the conductors.
+  if (ldrVal3 > 90 && checkpoint2 == true && checkpoint3 == false)
+  {
+    checkpoint3 = true;
+    digitalWrite (ledR3, HIGH);
+    digitalWrite (ledR2, LOW);
+    servo.write(180);
+    delay (2000);
+  }
+  if (ldrVal2 > 110 && checkpoint2 == true && checkpoint3 == true)
+  {
+    checkpoint3 = false;
+    digitalWrite (ledR2, HIGH);
+    digitalWrite (ledR3, LOW);
+    servo.write(0);
+    delay (2000);
+  }
+
+  // Ensure speaker stops playing sounds after it plays its tune.
+  noTone(speaker);
+}
