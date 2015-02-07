@@ -1,3 +1,14 @@
+/*
+ Project Title: Lab 4 Part 2
+ Student Name: Sally Luc
+ Course Code & Title: DIGF 2B03 Physical Computing
+ OCAD University
+ Created on Saturday January 31st, 2015
+ 
+ Based on
+ Tone, Tom Igoe, http://www.arduino.cc/en/Tutorial/Tone
+ */
+
 // Adds the Servo library to this project
 #include <Servo.h> 
 
