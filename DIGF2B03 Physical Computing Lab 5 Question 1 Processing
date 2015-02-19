@@ -1,0 +1,62 @@
+/*
+ Project Title: Lab 5 Part 1
+ Student Name: Sally Luc
+ Course Code & Title: DIGF 2B03 Physical Computing
+ OCAD University
+ Created on Wednesday February 18, 2015
+ 
+ Based on:
+ Tom Igoe, Physical Pixel, http://arduino.cc/en/Tutorial/PhysicalPixel
+ Seb Lee- Delisle, Bouncing Ball, http://www.openprocessing.org/sketch/47766
+ */
+
+import processing.serial.*; 
+
+// Sets port in use for Arduino 
+Serial port = new Serial(this, "/dev/tty.usbmodem1421", 9600);
+
+// Locations of the bouncing ball
+float x = 100;
+float y = 80;
+
+// Speed/ increment of the ball in the X and Y direction
+float speedX = 1;
+float speedY = 0;
+
+
+void setup() {
+
+  size(600, 600); // Size of window
+  smooth(); 
+  ellipseMode(CORNER // ensures ellipse is controlled from the corners
+}
+
+void draw() {
+  background(0); // background colour
+  fill(150); // fills the ellipse
+
+  ellipse(x, y, 30, 30); // draws ellipse
+
+  speedY = speedY + 0.5; // increases speed of ball in y direction
+
+  x = x + speedX; // increases x location of the ball
+  y = y + speedY;// increases y location of the ball
+
+  // Ball reverses if the ball hits the ends of the screen 
+  if ((x > width - 30) || (x <= 30)) {
+    speedX = -speedX;
+  }
+
+  // Ball bounces back up if the ball reaches bottom of the screen
+  if (y > height - 30) {
+    // resets ball to the bottom of screen 
+    y = height - 30;
+    // changes ball bounce direction
+    speedY = speedY * -0.9;
+
+    // sends a value to arduino to move physical component
+    port.write('B');
+  } else if (y <= 0) {
+    speedY = -speedY; // reverse direction if the ball hits the top of the screen
+  }
+}
