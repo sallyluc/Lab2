@@ -1,0 +1,58 @@
+/*
+ Project Title: Lab 5 Part 2
+ Student Name: Sally Luc
+ Course Code & Title: DIGF 2B03 Physical Computing
+ OCAD University
+ Created on Wednesday February 18, 2015
+ 
+ Based on:
+ David A Mellis, Graph, http://arduino.cc/en/Tutorial/Graph
+ */
+
+import processing.serial.*;
+
+Serial myPort;  // Port value     
+float c1, c2, c3; // Colour variables
+
+void setup () {
+  // size of window
+  size(600, 600);        
+  // Prints list of ports, calls on the port in use, starts to buffer incoming data until a data hits a new line
+  println(Serial.list());
+  myPort = new Serial(this, Serial.list()[5], 9600);
+  myPort.bufferUntil('\n');
+}
+
+void draw () {
+}
+
+void serialEvent (Serial myPort) {
+  // background color. Changes depending on the values of c1, c2, c3, which are dependent on an LDR input
+  background(c1, c3, c2);
+
+  // Starts reading data
+  String inString = myPort.readStringUntil('\n');
+
+  if (inString != null) {
+    // trims the spaces in the data
+    inString = trim(inString);
+    // converts string data to float data
+    float inByte = float(inString); 
+
+    // sets and maps colour values 
+    c1 = map (inByte, 0, 20, 0, 255);
+    c2 = map (inByte, 0, 20, 255, 0);
+    c3 = map (inByte, 0, 20, 50, 200);
+
+    // maps the byte value. Due to LDR reading low values of 0 - 20 in evening lighting, this maps between 0 - 20.
+    inByte = map(inByte, 0, 20, 100, 0);
+
+    // changes colors and draws circles from largest circle to smallest circle. Size changes due to LDR values. 
+    fill (c1, c2, c3);
+    ellipse(width/2, height/2, inByte*7, inByte*7);
+    fill (c2, c3, c1);
+    ellipse(width/2, height/2, inByte*6, inByte*6);
+    fill (c3, c1, c2);
+    ellipse(width/2, height/2, inByte*5, inByte*5);
+  }
+}
