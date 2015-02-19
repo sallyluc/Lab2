@@ -28,7 +28,7 @@ void setup() {
 
   size(600, 600); // Size of window
   smooth(); 
-  ellipseMode(CORNER // ensures ellipse is controlled from the corners
+  ellipseMode(CORNER); // ensures ellipse is controlled from the corners
 }
 
 void draw() {
