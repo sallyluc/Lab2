@@ -1,0 +1,16 @@
+/*
+ Project Title: Lab 5 Part 2
+ Student Name: Sally Luc
+ Course Code & Title: DIGF 2B03 Physical Computing
+ OCAD University
+ Created on Wednesday February 18, 2015
+ */
+
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  Serial.println(analogRead(A0));
+}
