@@ -1,0 +1,54 @@
+/*
+ Project Title: Lab 5 Part 1
+ Student Name: Sally Luc
+ Course Code & Title: DIGF 2B03 Physical Computing
+ OCAD University
+ Created on Wednesday February 18, 2015
+ 
+ Based on:
+ Physical PixelDavid. A Mellis, http://arduino.cc/en/Tutorial/PhysicalPixel
+ */
+
+#include <Servo.h>
+
+int incomingByte;      
+
+Servo servo;
+int pos = 180;
+float percentage = 0.9; 
+boolean check = true; 
+
+void setup() {
+  Serial.begin(9600);
+
+  servo.attach(9); // Attaches pin to servo
+  servo.write (pos);
+}
+
+void loop() {
+
+  // Sees if serial is open/available
+  if (Serial.available()) {
+    //Reads data from Serial
+    incomingByte = Serial.read();
+
+    // Retrieves data. If var is equal to char 'B', flip bool 'check' between true/false
+    if (incomingByte == 'B') {
+      check = !check;
+      
+      // Gets new position for servo. It is 90% of the previous position that is not 180.
+      pos = int (round(pos*0.9));
+
+      // Toggles servo position to make a bounce effect.
+      if (check == true){
+        servo.write(pos);
+        Serial.println (pos);
+      }
+      else
+      {
+        servo.write(0);
+      }
+    }
+  }
+}
+
