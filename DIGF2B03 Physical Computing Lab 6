@@ -1,0 +1,37 @@
+/* 
+ Project Title: Lab 6
+ Student Name: Sally Luc, Partner: Ryan Mason
+ Course Code & Title: DIGF 2B03 Physical Computing
+ OCAD University
+ Created on Monday March 16th, 2015
+ 
+ Reference:
+ Bean LED example 
+*/
+
+/* 
+  Most of this example code is in the public domain.
+*/
+
+void setup() {
+  // Optional: Use Bean.setAccelerationRange() to set the sensitivity 
+  // to something other than the default of ±2g.
+}
+
+// the loop routine runs over and over again forever:
+void loop() {
+   // Get the current acceleration with range of ±2g, 
+   // and a conversion of 3.91×10-3 g/unit or 0.03834(m/s^2)/units. 
+   AccelerationReading accel = Bean.getAcceleration();
+
+   // Update LED color
+   uint16_t r = (abs(accel.xAxis)) / 4;
+   uint16_t g = (abs(accel.yAxis)) / 4;
+   uint16_t b = (abs(accel.zAxis)) / 4;
+   
+   uint16_t gAll = (abs(accel.xAxis)+abs(accel.yAxis)+abs(accel.zAxis));
+   Bean.setLed((uint8_t)r,(uint8_t)g,(uint8_t)b);
+
+   Bean.setLed(r, g, b);
+   tone (A0, 300 + gAll * 10, 4);
+}
