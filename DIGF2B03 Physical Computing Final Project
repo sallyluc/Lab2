@@ -1,0 +1,305 @@
+/*
+ Project Title: Physical Computing Final: Human Game Controller
+ Student Name: Sally Luc
+ Course Code & Title: DIGF 2B03 Physical Computing
+ OCAD University
+ Created on Wednesday April 8th, 2015
+ 
+ Based on
+ Debounce, David A. Mellis, http://www.arduino.cc/en/Tutorial/Debounce
+ Countdown Timer, v.k, http://forum.processing.org/one/topic/how-to-create-countdown-timer.html
+ */
+
+// Imports for Serial and Arduino
+import processing.serial.*;
+import cc.arduino.*;
+
+/*
+
+ Name                       Type                     Description
+ arduino                    Arduino                  Initializes Arduino. 
+ 
+ A, B, X, Y                 int                      Buttons set to pin 2, 3, 4, 5 respectively. 
+ 
+ buttonStateA, 
+ buttonStateB, 
+ buttonStateX, 
+ buttonStateY               int                      Stores the state of the button; pressed or not pressed.
+ 
+ lastbuttonStateA,
+ lastbuttonStateB, 
+ lastbuttonStateX, 
+ lastbuttonStateY           int                      Stores the last state of the button; pressed or not pressed.
+ 
+ buttonPressed              int                      Stores which button was pressed. Used to compare button pressed to answer.
+ randomButtonToBePressed    int                      Generated random answer to game. Button pressed must match this.
+ 
+ lastDebounceTime           long                     Stores last debounce time when button is pressed.
+ debounceDelay              long                     Stores how long should the program check for when button is released.
+ 
+ scoreCount                 int                      Stores the score of the user's game.
+ 
+ font                       PFont                    Processing font.
+ timer                      String                   Displays the text stored according to timer value.
+ t                          int                      Timer value.
+ interval                   int                      How long timer lasts. 
+ 
+ Apng, Bpng, Xpng, Ypng     PImage                   Images for the buttons.
+ bg, gameOverBG             PImage                   Background themes (images).
+ 
+ gameOver                   boolean                  Checks if game ended.
+ 
+ 
+ */
+Arduino arduino;
+
+int A = 2, B = 3, X = 4, Y = 5; 
+int buttonStateA, buttonStateB, buttonStateX, buttonStateY;
+int readbuttonStateA, readbuttonStateB, readbuttonStateX, readbuttonStateY; 
+int lastbuttonStateA, lastbuttonStateB, lastbuttonStateX, lastbuttonStateY;
+
+int buttonPressed; 
+
+int randomButtonToBePressed = 0; 
+
+long lastDebounceTime = 0;
+long debounceDelay = 50; 
+
+int scoreCount =0;
+
+PFont font;
+String time = "63";
+int t;
+int interval = 63;
+
+
+PImage Apng, Bpng, Xpng, Ypng, bg, gameOverBG;
+
+boolean gameOver = false;
+
+// Setup - runs series of default codes at start of program
+void setup()
+{
+  size (1440, 780);
+  // Calls arduino and sets up pin modes for all digital I/O
+  arduino = new Arduino(this, Arduino.list()[5], 57600);
+  arduino.pinMode(A, Arduino.INPUT);
+  arduino.pinMode(B, Arduino.INPUT);
+  arduino.pinMode(X, Arduino.INPUT);
+  arduino.pinMode(Y, Arduino.INPUT);
+
+  // Generates first answer
+  randomButtonToBePressed = randomizeButton();
+
+
+  //Timer Font setting
+  font = createFont("Arial Rounded MT Bold", 48);
+  textFont(font);
+  // Sets image for each button
+  Apng = loadImage("A.png");
+  Bpng = loadImage("B.png");
+  Xpng = loadImage("X.png");
+  Ypng = loadImage("Y.png");
+  bg = loadImage ("bg.png");
+  gameOverBG = loadImage ("gameOverbg.png");
+}
+
+void draw ()
+{
+  if (gameOver == false) {
+    background(bg);
+    tempIndicator();// draws the button to be pressed
+
+    // Reads the state of each button
+    readbuttonStateA = arduino.digitalRead (A);
+    readbuttonStateB = arduino.digitalRead (B);
+    readbuttonStateX = arduino.digitalRead (X);
+    readbuttonStateY = arduino.digitalRead (Y);
+
+    // Ensures buttons are pressed properly --> uses Debounce
+    debounceA() ;
+    debounceB() ;
+    debounceX() ;
+    debounceY() ;
+
+    // Runs timer
+    countDownTimer();
+  } else
+  {
+    background(gameOverBG);
+    fill (255);
+    rectMode (CENTER);
+  text("High Score: " + scoreCount, width/2-110, height/2 -10);
+  text("Press 'r' to restart...", width/2-170, height/2 +60);
+  }
+
+  // Resets the game when R is pressed on the keyboard
+  if (keyPressed)
+  {
+    if (key == 'r') {
+      println ("pressed");
+      reset();
+    }
+  }
+}
+
+// Resets all variables
+void reset ()
+{
+  scoreCount =0;
+  time = "73";
+  t = 0;
+  interval = 73;
+  gameOver = false;
+}
+
+void tempIndicator()
+{
+  //ellipse (width/2, height/2, 100, 100);
+  rectMode(CENTER);
+  if ( randomButtonToBePressed == 1) // r
+  {
+    //fill(255, 0, 0);
+    image(Apng, width/2-100, height/2-100);
+  } else if (randomButtonToBePressed ==2)//g
+  {
+    //fill (0, 255, 0);
+    image(Bpng, width/2-100, height/2-100);
+  } else if (randomButtonToBePressed == 3)//b
+  {
+    //fill (0, 0, 255);
+    image(Xpng, width/2-100, height/2-100);
+  }
+  else//black
+  {
+    //fill (0);
+    image(Ypng, width/2-100, height/2-100);
+  }
+}
+
+// Checks when a button is pressed. Keeps score if the right button is pressed. Otherwise, player loses a point.
+void buttonCheck ()
+{
+  if (buttonPressed ==randomButtonToBePressed)
+  {
+    scoreCount++;
+  } else
+  {
+    scoreCount--;
+    if (scoreCount <=0)
+    {
+      scoreCount = 0;
+    }
+  }
+}
+
+// The next 4 methods are to ensure that the buttons are pressed and registered properly. 
+void debounceA() {
+  // Checks when button is released or clicked. Stores last time released or clicked. 
+  if (readbuttonStateA != lastbuttonStateA) {
+    lastDebounceTime = millis();
+  } 
+
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    // Changes button state
+    if (readbuttonStateA != buttonStateA) {
+      buttonStateA = readbuttonStateA;
+
+      // Checks if button was pressed. If it was, run a set of functions. 
+      if (buttonStateA == Arduino.HIGH) {
+        buttonPressed = 1; // Sets value for which button was pressed
+
+        buttonCheck ();// Checks if it's the right button
+
+        randomButtonToBePressed = randomizeButton(); // randomize the next answer
+      }
+    }
+  }
+  lastbuttonStateA = readbuttonStateA;// Setting last state to read state in case there is a change (pressed or un-pressed).
+}
+
+// Refer to funtion debounceA()
+void debounceB() {
+  if (readbuttonStateB != lastbuttonStateB) {
+    lastDebounceTime = millis();
+  } 
+
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    if (readbuttonStateB != buttonStateB) {
+      buttonStateB = readbuttonStateB;
+
+      if (buttonStateB == Arduino.HIGH) {
+        buttonPressed = 2;
+
+        buttonCheck ();
+
+        randomButtonToBePressed = randomizeButton();
+      }
+    }
+  }
+  lastbuttonStateB = readbuttonStateB;
+}
+
+// Refer to funtion debounceA()
+void debounceX() {
+  if (readbuttonStateX != lastbuttonStateX) {
+    lastDebounceTime = millis();
+  } 
+
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    if (readbuttonStateX != buttonStateX) {
+      buttonStateX = readbuttonStateX;
+
+      if (buttonStateX == Arduino.HIGH) {        
+        buttonPressed = 3;
+
+        buttonCheck ();
+
+        randomButtonToBePressed = randomizeButton();
+      }
+    }
+  }
+  lastbuttonStateX = readbuttonStateX;
+}
+
+// Refer to funtion debounceA()
+void debounceY() {
+  if (readbuttonStateY != lastbuttonStateY) {
+    lastDebounceTime = millis();
+  } 
+
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    if (readbuttonStateY != buttonStateY) {
+      buttonStateY = readbuttonStateY;
+
+      if (buttonStateY == Arduino.HIGH) {
+        buttonPressed = 4;
+
+        buttonCheck ();
+
+        randomButtonToBePressed = randomizeButton();
+      }
+    }
+  }
+  lastbuttonStateY = readbuttonStateY;
+}
+
+
+// Timer
+void countDownTimer()
+{
+  t = interval-int(millis()/1000); // gets the millis. Converts to int
+  time = nf(t, 2);// String value of time in 2 places (tens)
+  if (t == 0) { // End condition
+    gameOver = true;
+  }
+  fill (255);
+  text("Score: " + scoreCount, 20, 80);
+  text(time, width/2- 20, 80);
+}
+
+// randomizes answers
+int randomizeButton()
+{
+  return int (random(1, 5));
+}
